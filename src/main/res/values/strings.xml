@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">TanShu</string>
+    <string name="app_name">探书</string>
+    <string name="stack_empty">stack empty</string>
 </resources>

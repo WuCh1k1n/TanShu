@@ -1,13 +1,22 @@
 package com.wuch1k1n.tanshu;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.wuch1k1n.tanshu.model.Book;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +27,14 @@ import okhttp3.Response;
 import util.HttpUtil;
 import util.Utility;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeStackListener, View.OnClickListener {
 
     private static final String APPKEY = "133347f7868e963049602673bc00896c";
+    private Button mButtonLeft, mButtonRight;
+    private FloatingActionButton mFab;
+
+    private SwipeStack mSwipeStack;
+    private SwipeStackAdapter mAdapter;
     private List<Book> books;
 
     @Override
@@ -28,8 +42,54 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        queryFromJuhe(APPKEY, 246, 10, 3);
+        mSwipeStack = (SwipeStack) findViewById(R.id.swipeStack);
+        mButtonLeft = (Button) findViewById(R.id.buttonSwipeLeft);
+        mButtonRight = (Button) findViewById(R.id.buttonSwipeRight);
+        mFab = (FloatingActionButton) findViewById(R.id.fabAdd);
 
+        mButtonLeft.setOnClickListener(this);
+        mButtonRight.setOnClickListener(this);
+        mFab.setOnClickListener(this);
+
+        books = new ArrayList<>();
+        mAdapter = new SwipeStackAdapter(MainActivity.this, R.layout.card, books);
+        mSwipeStack.setAdapter(mAdapter);
+        mSwipeStack.setListener(this);
+
+        queryFromJuhe(APPKEY, 246, 10, 5);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.equals(mButtonLeft)) {
+            mSwipeStack.swipeTopViewToLeft();
+        } else if (v.equals(mButtonRight)) {
+            mSwipeStack.swipeTopViewToRight();
+        } else if (v.equals(mFab)) {
+
+        }
+    }
+
+    @Override
+    public void onViewClicked(int position) {
+        Toast.makeText(this, "点击了", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onViewSwipedToRight(int position) {
+        Toast.makeText(this, "右划了",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onViewSwipedToLeft(int position) {
+        Toast.makeText(this, "左划了",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStackEmpty() {
+        Toast.makeText(this, R.string.stack_empty, Toast.LENGTH_SHORT).show();
     }
 
     private void queryFromJuhe(String key, int catalogId, int startNum, final int length) {
@@ -62,15 +122,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
-                books = Utility.handleJuheResponse(responseText, length);
-                for(int i=0;i<length;i++){
-                    queryFromDouban(i);
+                List<Book> responseList = Utility.handleJuheResponse(responseText, length);
+                for (Book book : responseList) {
+                    books.add(book);
+                }
+                for (int i = 0; i < length; i++) {
+                    //queryFromDouban(i);
                 }
                 // 通过runOnUiThread()方法回到主线程处理逻辑
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+                        mAdapter.notifyDataSetChanged();
                     }
                 });
             }
