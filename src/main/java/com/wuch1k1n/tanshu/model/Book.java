@@ -1,32 +1,45 @@
 package com.wuch1k1n.tanshu.model;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2017/11/25.
  */
 
-public class Book {
+public class Book implements Serializable {
 
     private int id;
+
     /**
      * 书名
      */
-    private String name;
+    private String title;
+
     /**
      * 作者
      */
     private String author;
+
+    /**
+     * 出版社
+     */
+    private String publisher;
+
     /**
      * 简介
      */
     private String brief;
+
     /**
      * 封面图片地址
      */
     private String imgUrl;
+
     /**
      * 豆瓣评分
      */
     private double rating;
+
     /**
      * 网购地址
      */
@@ -40,12 +53,12 @@ public class Book {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     public String getAuthor() {
@@ -54,6 +67,14 @@ public class Book {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
     }
 
     public String getBrief() {

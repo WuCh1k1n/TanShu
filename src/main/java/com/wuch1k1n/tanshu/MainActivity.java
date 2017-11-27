@@ -1,18 +1,14 @@
 package com.wuch1k1n.tanshu;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
 import com.wuch1k1n.tanshu.model.Book;
 
 import java.io.IOException;
@@ -72,7 +68,10 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
 
     @Override
     public void onViewClicked(int position) {
-        Toast.makeText(this, "点击了", Toast.LENGTH_SHORT).show();
+        Book book = mAdapter.getItem(position);
+        Intent intent = new Intent(MainActivity.this, BookDetailActivity.class);
+        intent.putExtra("book", book);
+        startActivity(intent);
     }
 
     @Override
@@ -147,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
         // 请求参数
         Map params = new HashMap();
         // 书名
-        params.put("q", books.get(i).getName());
+        params.put("q", books.get(i).getTitle());
         // 取结果的条数
         params.put("count", 1);
         String url = address + "?" + HttpUtil.urlencode(params);
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
                 Book result = Utility.handleDoubanResponse(responseText);
                 books.get(i).setAuthor(result.getAuthor());
                 books.get(i).setRating(result.getRating());
-                Log.d("Test", books.get(i).getName());
+                Log.d("Test", books.get(i).getTitle());
                 Log.d("Test", books.get(i).getAuthor());
                 Log.d("Test", books.get(i).getBrief());
                 Log.d("Test", books.get(i).getImgUrl());

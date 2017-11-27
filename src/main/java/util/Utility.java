@@ -43,7 +43,7 @@ public class Utility {
                     for (int i = 0; i < length; i++) {
                         JSONObject bookObject = dataArray.getJSONObject(i);
                         Book book = new Book();
-                        book.setName(bookObject.getString("title"));
+                        book.setTitle(bookObject.getString("title"));
                         book.setBrief(bookObject.getString("sub2"));
                         book.setImgUrl(bookObject.getString("img"));
                         book.setOnline(bookObject.getString("online"));
@@ -68,6 +68,7 @@ public class Utility {
                 book.setRating(ratingObject.getDouble("average"));
                 JSONArray authorArray = tempObject.getJSONArray("author");
                 book.setAuthor(authorArray.getString(0));
+                book.setPublisher(tempObject.getString("publisher"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
