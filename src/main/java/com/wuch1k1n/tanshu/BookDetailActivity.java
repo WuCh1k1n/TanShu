@@ -2,7 +2,9 @@ package com.wuch1k1n.tanshu;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +31,8 @@ public class BookDetailActivity extends AppCompatActivity {
     private TextView tv_book_publisher;
     private TextView tv_book_rating;
     private TextView tv_book_brief;
+    private FloatingActionButton fab_like;
+    private FloatingActionButton fab_unlike;
 
     private Book mbook;
 
@@ -43,6 +47,22 @@ public class BookDetailActivity extends AppCompatActivity {
         tv_book_publisher = findViewById(R.id.tv_book_publisher);
         tv_book_rating = findViewById(R.id.tv_book_rating);
         tv_book_brief = findViewById(R.id.tv_book_brief);
+        fab_like = findViewById(R.id.fab_like);
+        fab_unlike = findViewById(R.id.fab_unlike);
+
+        fab_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        fab_unlike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         mbook = (Book) getIntent().getSerializableExtra("book");
         queryFromDouban();

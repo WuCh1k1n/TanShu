@@ -64,30 +64,39 @@
         android:textColor="#000"
         android:textSize="24sp" />
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_book_brief"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#000" />
-    </ScrollView>
+            android:layout_height="match_parent">
 
-    <android.support.design.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/tv_book_brief"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#000" />
+        </ScrollView>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabAdd"
+            android:id="@+id/fab_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
+            android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_content_add"
-            app:fabSize="normal"/>
+            android:backgroundTint="@color/light_red"
+            android:src="@mipmap/ic_heart"
+            app:fabSize="normal" />
 
-    </android.support.design.widget.CoordinatorLayout>
-
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_unlike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/light_grey"
+            android:src="@mipmap/ic_cross"
+            app:fabSize="normal" />
+    </FrameLayout>
 </LinearLayout>

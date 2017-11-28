@@ -278,6 +278,9 @@ public class SwipeStack extends ViewGroup {
         if (getChildCount() == 0) {
             if (mListener != null) mListener.onStackEmpty();
         }
+        if (getChildCount() == 1) {
+            if (mListener != null) mListener.onStackLeftOne();
+        }
     }
 
     @Override
@@ -453,6 +456,11 @@ public class SwipeStack extends ViewGroup {
          * Called when the last view has been dismissed.
          */
         void onStackEmpty();
+
+        /**
+         * Called when the stack left one view .
+         */
+        void onStackLeftOne();
     }
 
     /**

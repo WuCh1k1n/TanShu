@@ -1,14 +1,14 @@
 package com.wuch1k1n.tanshu;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.wuch1k1n.tanshu.model.Book;
 
 import java.io.IOException;
@@ -26,8 +26,7 @@ import util.Utility;
 public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeStackListener, View.OnClickListener {
 
     private static final String APPKEY = "133347f7868e963049602673bc00896c";
-    private Button mButtonLeft, mButtonRight;
-    private FloatingActionButton mFab;
+    private FloatingActionButton mButtonLeft, mButtonRight;
 
     private SwipeStack mSwipeStack;
     private SwipeStackAdapter mAdapter;
@@ -38,21 +37,19 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSwipeStack = (SwipeStack) findViewById(R.id.swipeStack);
-        mButtonLeft = (Button) findViewById(R.id.buttonSwipeLeft);
-        mButtonRight = (Button) findViewById(R.id.buttonSwipeRight);
-        mFab = (FloatingActionButton) findViewById(R.id.fabAdd);
+        mSwipeStack = findViewById(R.id.swipeStack);
+        mButtonLeft = findViewById(R.id.buttonSwipeLeft);
+        mButtonRight = findViewById(R.id.buttonSwipeRight);
 
         mButtonLeft.setOnClickListener(this);
         mButtonRight.setOnClickListener(this);
-        mFab.setOnClickListener(this);
 
         books = new ArrayList<>();
         mAdapter = new SwipeStackAdapter(MainActivity.this, R.layout.card, books);
         mSwipeStack.setAdapter(mAdapter);
         mSwipeStack.setListener(this);
 
-        queryFromJuhe(APPKEY, 246, 10, 5);
+        queryFromJuhe(APPKEY, 246, 10, 10);
     }
 
     @Override
@@ -61,8 +58,6 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
             mSwipeStack.swipeTopViewToLeft();
         } else if (v.equals(mButtonRight)) {
             mSwipeStack.swipeTopViewToRight();
-        } else if (v.equals(mFab)) {
-
         }
     }
 
@@ -76,19 +71,27 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
 
     @Override
     public void onViewSwipedToRight(int position) {
-        Toast.makeText(this, "右划了",
-                Toast.LENGTH_SHORT).show();
+        Book mbook = mAdapter.getItem(position);
+        mbook.save();
+        Toast.makeText(MainActivity.this, "已收藏" + "《" +
+                mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onViewSwipedToLeft(int position) {
-        Toast.makeText(this, "左划了",
-                Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
     public void onStackEmpty() {
-        Toast.makeText(this, R.string.stack_empty, Toast.LENGTH_SHORT).show();
+        queryFromJuhe(APPKEY, 246, 21, 5);
+    }
+
+    @Override
+    public void onStackLeftOne() {
+        //刷新数据适配器
+        //books.add(books.get(0));
+        //mAdapter.notifyDataSetChanged();
     }
 
     private void queryFromJuhe(String key, int catalogId, int startNum, final int length) {
@@ -122,11 +125,9 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
                 List<Book> responseList = Utility.handleJuheResponse(responseText, length);
+                //books.clear();
                 for (Book book : responseList) {
                     books.add(book);
-                }
-                for (int i = 0; i < length; i++) {
-                    //queryFromDouban(i);
                 }
                 // 通过runOnUiThread()方法回到主线程处理逻辑
                 runOnUiThread(new Runnable() {
@@ -140,16 +141,18 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
     }
 
     // 向豆瓣网查询图书信息
-    private void queryFromDouban(final int i) {
+    private void queryFromDouban(final Book book) {
         // 豆瓣网请求图书信息地址
-        String address = "https://api.douban.com/v2/book/search";
+        final String address = "https://api.douban.com/v2/book/search";
         // 请求参数
         Map params = new HashMap();
         // 书名
-        params.put("q", books.get(i).getTitle());
+        params.put("q", book.getTitle());
         // 取结果的条数
         params.put("count", 1);
         String url = address + "?" + HttpUtil.urlencode(params);
+
+        // 弹出进度对话框
 
         HttpUtil.sendOkHttpRequest(url, new Callback() {
             @Override
@@ -158,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        // 关闭进度对话框
                         Toast.makeText(MainActivity.this, "豆瓣网查询失败", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -165,21 +169,20 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                final Book mbook = book;
                 String responseText = response.body().string();
                 // result带有图书作者、评分信息
                 Book result = Utility.handleDoubanResponse(responseText);
-                books.get(i).setAuthor(result.getAuthor());
-                books.get(i).setRating(result.getRating());
-                Log.d("Test", books.get(i).getTitle());
-                Log.d("Test", books.get(i).getAuthor());
-                Log.d("Test", books.get(i).getBrief());
-                Log.d("Test", books.get(i).getImgUrl());
-                Log.d("Test", String.valueOf(books.get(i).getRating()));
+                mbook.setAuthor(result.getAuthor());
+                mbook.setPublisher(result.getPublisher());
+                mbook.setRating(result.getRating());
+                mbook.save();
                 // 通过runOnUiThread()方法回到主线程处理逻辑
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(MainActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "已收藏" + "《" +
+                                mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

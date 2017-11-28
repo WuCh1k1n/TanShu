@@ -1,12 +1,14 @@
 package com.wuch1k1n.tanshu.model;
 
+import org.litepal.crud.DataSupport;
+
 import java.io.Serializable;
 
 /**
  * Created by Administrator on 2017/11/25.
  */
 
-public class Book implements Serializable {
+public class Book extends DataSupport implements Serializable {
 
     private int id;
 
