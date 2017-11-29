@@ -269,7 +269,7 @@ public class SwipeStack extends ViewGroup {
         }
     }
 
-    private void removeTopView() {
+    void removeTopView() {
         if (mTopView != null) {
             removeView(mTopView);
             mTopView = null;

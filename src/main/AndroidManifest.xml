@@ -6,13 +6,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="org.litepal.LitePalApplication">
+        android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +21,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".BookDetailActivity" />
+        <activity
+            android:name=".BookCollectedActivity"
+            android:label="@string/title_activity_book_collected"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

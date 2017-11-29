@@ -1,10 +1,12 @@
 package com.wuch1k1n.tanshu;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,8 +14,11 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.wuch1k1n.tanshu.model.Book;
 
+import org.litepal.crud.DataSupport;
+
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -33,8 +38,13 @@ public class BookDetailActivity extends AppCompatActivity {
     private TextView tv_book_brief;
     private FloatingActionButton fab_like;
     private FloatingActionButton fab_unlike;
+    private Button bt_isCollected;
+    private Button bt_buy;
 
     private Book mbook;
+    private List<Book> collectedBooks;
+
+    private Boolean isCollected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,22 +59,80 @@ public class BookDetailActivity extends AppCompatActivity {
         tv_book_brief = findViewById(R.id.tv_book_brief);
         fab_like = findViewById(R.id.fab_like);
         fab_unlike = findViewById(R.id.fab_unlike);
+        bt_isCollected = findViewById(R.id.bt_isCollected);
+        bt_buy = findViewById(R.id.bt_buy);
+
+        // 获悉是否从主页面跳转到该页面
+        Intent intent = getIntent();
+        final Boolean fromHome = intent.getBooleanExtra("from_home", false);
 
         fab_like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (fromHome) {
+                    mbook.save();
+                    bt_isCollected.setText("取消收藏");
+                    Toast.makeText(BookDetailActivity.this, "已收藏" + "《" +
+                            mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    if (isCollected) {
+                        Toast.makeText(BookDetailActivity.this, "已收藏" + "《" +
+                                mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                    } else {
+                        mbook.save();
+                        bt_isCollected.setText("取消收藏");
+                        Toast.makeText(BookDetailActivity.this, "已收藏" + "《" +
+                                mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
         fab_unlike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (fromHome) {
+                    setResult(RESULT_CANCELED);
+                    finish();
+                } else {
+                    if (isCollected) {
+                        DataSupport.deleteAll(Book.class, "title = ?", mbook.getTitle());
+                        bt_isCollected.setText("收藏");
+                        Toast.makeText(BookDetailActivity.this, "已取消收藏" + "《" +
+                                mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 
         mbook = (Book) getIntent().getSerializableExtra("book");
+        // 判断是否已经收藏该书
+        collectedBooks = DataSupport.findAll(Book.class);
+        for (Book book : collectedBooks) {
+            if (book.getTitle().equals(mbook.getTitle())) {
+                bt_isCollected.setText("取消收藏");
+                isCollected = true;
+            }
+        }
+        bt_isCollected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isCollected) {
+                    DataSupport.deleteAll(Book.class, "title = ?", mbook.getTitle());
+                    bt_isCollected.setText("收藏");
+                    Toast.makeText(BookDetailActivity.this, "已取消收藏" + "《" +
+                            mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                } else {
+                    mbook.save();
+                    bt_isCollected.setText("取消收藏");
+                    Toast.makeText(BookDetailActivity.this, "已收藏" + "《" +
+                            mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         queryFromDouban();
     }
 

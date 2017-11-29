@@ -53,6 +53,31 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bt_isCollected"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_round_button_blue"
+                    android:text="收藏"
+                    android:textColor="#fff" />
+
+                <Button
+                    android:id="@+id/bt_buy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_round_button_red"
+                    android:text="购买"
+                    android:textColor="#fff" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
@@ -85,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:backgroundTint="@color/light_red"
+            android:backgroundTint="@color/lightRed"
             android:src="@mipmap/ic_heart"
             app:fabSize="normal" />
 
@@ -95,7 +120,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|start"
             android:layout_margin="16dp"
-            android:backgroundTint="@color/light_grey"
+            android:backgroundTint="@color/lightGrey"
             android:src="@mipmap/ic_cross"
             app:fabSize="normal" />
     </FrameLayout>

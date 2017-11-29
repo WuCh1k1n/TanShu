@@ -4,11 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
 import com.wuch1k1n.tanshu.model.Book;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import util.Utility;
 public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeStackListener, View.OnClickListener {
 
     private static final String APPKEY = "133347f7868e963049602673bc00896c";
+    private static final int REQUEST_BOOK_DETAIL = 1;
     private FloatingActionButton mButtonLeft, mButtonRight;
 
     private SwipeStack mSwipeStack;
@@ -62,17 +64,43 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menuBookList:
+                Intent intent = new Intent(this, BookCollectedActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.menuSet:
+                break;
+            default:
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
     public void onViewClicked(int position) {
         Book book = mAdapter.getItem(position);
         Intent intent = new Intent(MainActivity.this, BookDetailActivity.class);
+        intent.putExtra("from_home", true);
         intent.putExtra("book", book);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_BOOK_DETAIL);
     }
 
     @Override
     public void onViewSwipedToRight(int position) {
         Book mbook = mAdapter.getItem(position);
-        mbook.save();
+        // 向豆瓣网查询图书详细信息
+        queryFromDoubanAndSave(mbook);
         Toast.makeText(MainActivity.this, "已收藏" + "《" +
                 mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
     }
@@ -84,14 +112,12 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
 
     @Override
     public void onStackEmpty() {
-        queryFromJuhe(APPKEY, 246, 21, 5);
+
     }
 
     @Override
     public void onStackLeftOne() {
-        //刷新数据适配器
-        //books.add(books.get(0));
-        //mAdapter.notifyDataSetChanged();
+        queryFromJuhe(APPKEY, 246, 21, 5);
     }
 
     private void queryFromJuhe(String key, int catalogId, int startNum, final int length) {
@@ -124,9 +150,9 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
-                List<Book> responseList = Utility.handleJuheResponse(responseText, length);
+                List<Book> results = Utility.handleJuheResponse(responseText, length);
                 //books.clear();
-                for (Book book : responseList) {
+                for (Book book : results) {
                     books.add(book);
                 }
                 // 通过runOnUiThread()方法回到主线程处理逻辑
@@ -141,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
     }
 
     // 向豆瓣网查询图书信息
-    private void queryFromDouban(final Book book) {
+    private void queryFromDoubanAndSave(final Book book) {
         // 豆瓣网请求图书信息地址
         final String address = "https://api.douban.com/v2/book/search";
         // 请求参数
@@ -152,8 +178,6 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
         params.put("count", 1);
         String url = address + "?" + HttpUtil.urlencode(params);
 
-        // 弹出进度对话框
-
         HttpUtil.sendOkHttpRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -161,8 +185,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // 关闭进度对话框
-                        Toast.makeText(MainActivity.this, "豆瓣网查询失败", Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
@@ -181,11 +204,25 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(MainActivity.this, "已收藏" + "《" +
-                                mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_BOOK_DETAIL:
+                if (resultCode == RESULT_CANCELED) {
+                    mSwipeStack.removeTopView();
+                }
+                if (resultCode == RESULT_OK) {
+                    mSwipeStack.removeTopView();
+                }
+                break;
+            default:
+        }
     }
 }
