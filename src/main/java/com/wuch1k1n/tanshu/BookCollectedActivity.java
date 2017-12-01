@@ -3,6 +3,8 @@ package com.wuch1k1n.tanshu;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -41,6 +43,13 @@ public class BookCollectedActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        lv_book_collected.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                menu.add(0, 0, 0, "取消收藏");
+            }
+        });
     }
 
     private void getCollectedBook() {
@@ -58,4 +67,19 @@ public class BookCollectedActivity extends AppCompatActivity {
         getCollectedBook();
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        //info.id得到listview中选择的条目绑定的id
+        String id = String.valueOf(info.id);
+        switch (item.getItemId()) {
+            // 取消收藏
+            case 0:
+                DataSupport.deleteAll(Book.class, "title = ?", books.get(Integer.parseInt(id)).getTitle());
+                books.remove(Integer.parseInt(id));
+                mAdapter.notifyDataSetChanged();
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 }
