@@ -1,9 +1,11 @@
 package com.wuch1k1n.tanshu;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,10 +36,24 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
     private SwipeStackAdapter mAdapter;
     private List<Book> books;
 
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+    private String[] prefers;
+
+    private int catalogId;
+    private int lastId = -1;
+    private int startNum;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        pref = getSharedPreferences("config", MODE_PRIVATE);
+        editor = pref.edit();
+
+        //读取阅读偏好编号
+        String prefer = pref.getString("prefer", "");
+        prefers = prefer.split("#");
 
         mSwipeStack = findViewById(R.id.swipeStack);
         mButtonLeft = findViewById(R.id.buttonSwipeLeft);
@@ -51,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
         mSwipeStack.setAdapter(mAdapter);
         mSwipeStack.setListener(this);
 
-        queryFromJuhe(APPKEY, 246, 10, 10);
+        queryBooks(prefers);
     }
 
     @Override
@@ -103,21 +119,43 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
         queryFromDoubanAndSave(mbook);
         Toast.makeText(MainActivity.this, "已收藏" + "《" +
                 mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
+        editor.putInt(String.valueOf(catalogId), startNum++);
+        editor.commit();
+        Log.d("Test", startNum + "");
     }
 
     @Override
     public void onViewSwipedToLeft(int position) {
-
+        editor.putInt(String.valueOf(catalogId), ++startNum);
+        editor.commit();
+        Log.d("Test", startNum + "");
     }
 
     @Override
     public void onStackEmpty() {
-
+        // 读取该目录查看进度
+        startNum = pref.getInt(String.valueOf(catalogId), 0);
+        queryBooks(prefers);
     }
 
     @Override
     public void onStackLeftOne() {
-        queryFromJuhe(APPKEY, 246, 21, 5);
+
+    }
+
+    private void queryBooks(String[] prefers) {
+        // 随机生成查询目录id
+        int count = prefers.length;
+        int i = (int) (Math.random() * 100);
+        int index = i % count;
+        catalogId = Integer.parseInt(prefers[index]);
+
+        // 读取该目录查看进度
+        startNum = pref.getInt(String.valueOf(catalogId), 0);
+
+        // 每次查询10条数据
+        queryFromJuhe(APPKEY, catalogId, startNum, 5);
+        lastId = catalogId;
     }
 
     private void queryFromJuhe(String key, int catalogId, int startNum, final int length) {
@@ -134,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
         // 数据返回条数，最大30
         params.put("rn", length);
         String url = address + "?" + HttpUtil.urlencode(params);
+        Log.d("Test", url);
 
         HttpUtil.sendOkHttpRequest(url, new Callback() {
             @Override

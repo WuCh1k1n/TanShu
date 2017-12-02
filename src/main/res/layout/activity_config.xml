@@ -183,16 +183,17 @@
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_round_button_blue"
-                android:text="计算机" />
+                android:text="儿童文学" />
         </LinearLayout>
 
         <Button
             android:id="@+id/bt_commit"
             android:layout_width="180dp"
-            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
             android:background="@drawable/bg_round_button_blue"
-            android:text="完成设置" />
+            android:text="完成设置"
+            android:textColor="#fff" />
     </LinearLayout>
 </RelativeLayout>
