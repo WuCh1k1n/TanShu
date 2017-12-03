@@ -84,6 +84,7 @@ public class BookDetailActivity extends AppCompatActivity {
                     } else {
                         mbook.save();
                         bt_isCollected.setText("取消收藏");
+                        isCollected = true;
                         Toast.makeText(BookDetailActivity.this, "已收藏" + "《" +
                                 mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
                     }
@@ -101,6 +102,7 @@ public class BookDetailActivity extends AppCompatActivity {
                     if (isCollected) {
                         DataSupport.deleteAll(Book.class, "title = ?", mbook.getTitle());
                         bt_isCollected.setText("收藏");
+                        isCollected = false;
                         Toast.makeText(BookDetailActivity.this, "已取消收藏" + "《" +
                                 mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
                     }
@@ -133,11 +135,13 @@ public class BookDetailActivity extends AppCompatActivity {
                 if (isCollected) {
                     DataSupport.deleteAll(Book.class, "title = ?", mbook.getTitle());
                     bt_isCollected.setText("收藏");
+                    isCollected = false;
                     Toast.makeText(BookDetailActivity.this, "已取消收藏" + "《" +
                             mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
                 } else {
                     mbook.save();
                     bt_isCollected.setText("取消收藏");
+                    isCollected = true;
                     Toast.makeText(BookDetailActivity.this, "已收藏" + "《" +
                             mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
                 }
