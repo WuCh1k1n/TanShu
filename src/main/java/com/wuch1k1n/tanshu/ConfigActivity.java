@@ -69,10 +69,10 @@ public class ConfigActivity extends AppCompatActivity {
                         prefer.append(catalog_ids[i] + "#");
                     }
                 }
-                Log.d("Test", prefer.toString());
                 editor.putString("prefer", prefer.toString());
                 editor.putBoolean("is_set", true);
                 editor.commit();
+                Log.d("Test", pref.getString("prefer", ""));
                 Intent intent = new Intent(ConfigActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();

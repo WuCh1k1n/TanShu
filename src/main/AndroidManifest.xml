@@ -32,6 +32,9 @@
         <activity
             android:name=".BookCollectedActivity"
             android:label="@string/title_activity_book_collected" />
+        <activity
+            android:name=".BuyActivity"
+            android:label="购买图书" />
     </application>
 
 </manifest>

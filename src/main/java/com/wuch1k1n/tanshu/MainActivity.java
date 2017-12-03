@@ -95,6 +95,9 @@ public class MainActivity extends AppCompatActivity implements SwipeStack.SwipeS
                 startActivity(intent);
                 break;
             case R.id.menuSet:
+                Intent intent1 = new Intent(this, ConfigActivity.class);
+                startActivity(intent1);
+                finish();
                 break;
             default:
         }

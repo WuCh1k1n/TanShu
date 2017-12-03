@@ -75,4 +75,10 @@ public class Utility {
         }
         return book;
     }
+
+    public static String getBuyUrl(String online) {
+        int start = online.indexOf("h");
+        int end = online.indexOf("l", start);
+        return online.substring(start, end + 1);
+    }
 }

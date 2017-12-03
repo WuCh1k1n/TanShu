@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -104,6 +105,16 @@ public class BookDetailActivity extends AppCompatActivity {
                                 mbook.getTitle() + "》", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        });
+
+        bt_buy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(BookDetailActivity.this, BuyActivity.class);
+                intent1.putExtra("web_url", Utility.getBuyUrl(mbook.getOnline()));
+                Log.d("Test", Utility.getBuyUrl(mbook.getOnline()));
+                startActivity(intent1);
             }
         });
 
